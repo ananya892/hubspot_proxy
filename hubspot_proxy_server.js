@@ -12,7 +12,7 @@ app.use(express.json());
 
 // HubSpot API Proxy Endpoint
 app.post('/hubspot-api', async (req, res) => {
-  const { url, method, data, params } = req.body;
+  const { url, method, headers, data, params } = req.body;
 
   if (!endpoint || !method) {
     return res.status(400).json({ error: 'Missing required fields: endpoint or method.' });
@@ -22,10 +22,7 @@ app.post('/hubspot-api', async (req, res) => {
     const response = await axios({
       url: url,
       method: method.toUpperCase(),
-      headers: {
-        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
       params: params || {},
       data: data || null,
     });
