@@ -19,7 +19,7 @@ app.get('/',async (req, res)=>{
 app.post('/hubspot-api', async (req, res) => {
   const { url, method, headers, data, params } = req.body;
 
-  if (!endpoint || !method) {
+  if (!url || !headers || !method) {
     return res.status(400).json({ error: 'Missing required fields: endpoint or method.' });
   }
 
