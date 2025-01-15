@@ -10,6 +10,11 @@ const PORT = 3000;
 app.use(cors({ origin: 'https://your-hubspot-cms-domain.com' })); 
 app.use(express.json());
 
+app.get('/',async (req, res)=>{
+    res.send("Server running")
+})
+
+
 // HubSpot API Proxy Endpoint
 app.post('/hubspot-api', async (req, res) => {
   const { url, method, headers, data, params } = req.body;
