@@ -7,7 +7,7 @@ const app = express();
 const PORT = 3000;
 
 // Middleware
-app.use(cors({ origin: 'https://your-hubspot-cms-domain.com' })); 
+app.use(cors({ origin: 'https://www.absolutetranslations.com' })); 
 app.use(express.json());
 
 app.get('/',async (req, res)=>{
@@ -20,7 +20,7 @@ app.post('/hubspot-api', async (req, res) => {
   const { url, method, headers, data, params } = req.body;
 
   if (!url || !headers || !method) {
-    return res.status(400).json({ error: 'Missing required fields: endpoint or method.' });
+    return res.status(400).json({ error: 'Missing required fields: url, method or headers' });
   }
 
   try {
