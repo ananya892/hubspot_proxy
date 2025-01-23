@@ -19,9 +19,9 @@ app.get('/',async (req, res)=>{
 app.post('/hubspot-api', async (req, res) => {
   const { url, method, headers, data, params } = req.body;
 
-  if (!url || !headers || !method) {
-    return res.status(400).json({ error: 'Missing required fields: url, method or headers' });
-  }
+  // if (!url || !headers || !method) {
+  //   return res.status(400).json({ error: 'Missing required fields: url, method or headers' });
+  // }
 
   try {
     const response = await axios({
