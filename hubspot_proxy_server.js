@@ -17,7 +17,7 @@ app.get('/',async (req, res)=>{
 
 // HubSpot API Proxy Endpoint
 app.post('/hubspot-api', async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { url, method, headers, data, params } = req.body;
 
   if (!url || !headers || !method) {
