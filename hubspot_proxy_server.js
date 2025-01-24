@@ -9,7 +9,7 @@ const PORT = 3000;
 // Middleware
 app.use(cors({ origin: 'https://www.absolutetranslations.com' })); 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 app.get('/',async (req, res)=>{
     res.send("Server running")
 })
