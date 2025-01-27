@@ -24,6 +24,29 @@ app.post('/hubspot-api', async (req, res) => {
   }
 
   try {
+    const response = await axios({
+      url: url,
+      method: method.toUpperCase(),
+      headers: headers,
+      params: params || {},
+      data: data || null,
+    });
+
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error('HubSpot API Error:', error.response?.data || error.message);
+    res.status(error.response?.status || 500).json(error.response?.data || { error: 'Internal Server Error' });
+  }
+});
+
+app.post('/hubspot-api-file', async (req, res) => {
+  const { url, method, headers, data, params } = req.body;
+
+  if (!url || !headers || !method) {
+    return res.status(400).json({ error: 'Missing required fields: url, method or headers' });
+  }
+
+  try {
     if (data.file) {
       if (!data.file_name || !data.folderId) {
         return res.status(400).json({ error: 'Missing fileName or folderId for the base64 file.' });
@@ -49,7 +72,6 @@ app.post('/hubspot-api', async (req, res) => {
     res.status(error.response?.status || 500).json(error.response?.data || { error: 'Internal Server Error' });
   }
 });
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
