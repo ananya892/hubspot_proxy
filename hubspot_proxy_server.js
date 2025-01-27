@@ -41,11 +41,11 @@ app.post('/hubspot-api', async (req, res) => {
 
 app.post('/hubspot-api-file', async (req, res) => {
   const { url, method, headers, data, params } = req.body;
-
+  
   if (!url || !headers || !method) {
     return res.status(400).json({ error: 'Missing required fields: url, method or headers' });
   }
-
+  console.log("base64",data.file)
   try {
     if (data.file) {
       if (!data.file_name || !data.folderId) {
@@ -56,7 +56,7 @@ app.post('/hubspot-api-file', async (req, res) => {
       const fileBuffer = Buffer.from(base64Data, 'base64');
       data.file = fileBuffer;
     }
-    console.log(data.file)
+    console.log("Buffer",data.file)
     // Make the API request
     // const response = await axios({
     //   url,
