@@ -1,8 +1,9 @@
-require('dotenv').config(); // Load environment variables
+// require('dotenv').config(); // Load environment variables
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-
+const multer  = require('multer')
+// const upload = multer({ dest: 'uploads/' })
 const app = express();
 const PORT = 3000;
 
@@ -14,9 +15,28 @@ app.get('/',async (req, res)=>{
     res.send("Server running")
 })
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Save files to the 'uploads' folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Add a timestamp to the file name
+  },
+});
+// Multer instance with file type filter (accept only PDFs)
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed!'), false);
+    }
+  },
+});
 
 // HubSpot API Proxy Endpoint
-app.post('/hubspot-api', async (req, res) => {
+app.post('/hubspot-api',upload.single('pdf'), async (req, res) => {
   console.log(req.body);
   const { url, method, headers, data, params } = req.body;
 
