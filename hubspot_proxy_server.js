@@ -1,43 +1,22 @@
-// require('dotenv').config(); // Load environment variables
+require('dotenv').config(); // Load environment variables
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const multer  = require('multer')
-// const upload = multer({ dest: 'uploads/' })
+
 const app = express();
 const PORT = 3000;
 
 // Middleware
 app.use(cors({ origin: 'https://www.absolutetranslations.com' })); 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.get('/',async (req, res)=>{
     res.send("Server running")
 })
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Save files to the 'uploads' folder
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Add a timestamp to the file name
-  },
-});
-// Multer instance with file type filter (accept only PDFs)
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF files are allowed!'), false);
-    }
-  },
-});
 
 // HubSpot API Proxy Endpoint
-app.post('/hubspot-api',upload.single('pdf'), async (req, res) => {
-  console.log(req.body);
+app.post('/hubspot-api', async (req, res) => {
   const { url, method, headers, data, params } = req.body;
 
   if (!url || !headers || !method) {
@@ -45,13 +24,24 @@ app.post('/hubspot-api',upload.single('pdf'), async (req, res) => {
   }
 
   try {
-    const response = await axios({
-      url: url,
-      method: method.toUpperCase(),
-      headers: headers,
-      params: params || {},
-      data: data || null,
-    });
+    if (data.file) {
+      if (!data.file_name || !data.folderId) {
+        return res.status(400).json({ error: 'Missing fileName or folderId for the base64 file.' });
+      }
+      const fileData = data.file;
+      const base64Data = fileData.split(';base64,').pop();
+      const fileBuffer = Buffer.from(base64Data, 'base64');
+      data.file = fileBuffer;
+    }
+    console.log(data.file)
+    // Make the API request
+    // const response = await axios({
+    //   url,
+    //   method: method.toUpperCase(),
+    //   headers,
+    //   params: params || {},
+    //   data: data,
+    // });
 
     res.status(response.status).json(response.data);
   } catch (error) {
