@@ -17,46 +17,46 @@ app.get('/',async (req, res)=>{
 
 // HubSpot API Proxy Endpoint
 app.post('/hubspot-api', async (req, res) => {
-  const { url, method, headers, data, params, base64File, fileName } = req.body;
+  const { url, method, headers, data, params } = req.body;
 
   if (!url || !headers || !method) {
     return res.status(400).json({ error: 'Missing required fields: url, method or headers' });
   }
 
   try {
-    let requestData = data || {};
+    // let requestData = data || {};
 
     // Handle base64 file if provided
-    if (base64File) {
-      if (!fileName) {
-        return res.status(400).json({ error: 'Missing fileName for the base64 file.' });
+    if (data.file) {
+      if (!data.file_name || !data.folderId) {
+        return res.status(400).json({ error: 'Missing fileName or folderId for the base64 file.' });
       }
 
       // Convert base64 to binary buffer
-      const fileBuffer = Buffer.from(base64File, 'base64');
-
+      const fileBuffer = Buffer.from(data.file, 'base64');
+      data.file = fileBuffer;
       // Use FormData for file upload
-      const FormData = require('form-data');
-      const formData = new FormData();
+      // const FormData = require('form-data');
+      // const formData = new FormData();
 
-      formData.append('file', fileBuffer, { filename: fileName });
+      // formData.append('file', fileBuffer, { filename: fileName });
 
       // Add other data fields if provided
-      if (data) {
-        Object.keys(data).forEach((key) => formData.append(key, data[key]));
-      }
+      // if (data) {
+      //   Object.keys(data).forEach((key) => formData.append(key, data[key]));
+      // }
 
-      headers['Content-Type'] = `multipart/form-data; boundary=${formData._boundary}`;
-      requestData = formData;
+      // headers['Content-Type'] = `multipart/form-data; boundary=${formData._boundary}`;
+      // requestData = formData;
     }
-
+    console.log(data)
     // Make the API request
     const response = await axios({
       url,
       method: method.toUpperCase(),
       headers,
       params: params || {},
-      data: requestData,
+      data: data,
     });
 
     res.status(response.status).json(response.data);
