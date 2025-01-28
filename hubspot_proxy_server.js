@@ -2,7 +2,7 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-
+const FormData = require("form-data");
 const app = express();
 const PORT = 3000;
 
@@ -70,6 +70,36 @@ app.post('/hubspot-api-file', async (req, res) => {
   } catch (error) {
     console.error('HubSpot API Error:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json(error.response?.data || { error: 'Internal Server Error' });
+  }
+});
+
+app.post("/upload-to-hubspot", async (req, res) => {
+  const { file, folderId, options } = req.body;
+
+  // Prepare form data for HubSpot file upload
+  const form = new FormData();
+  form.append("file", file); // This should be the file content sent from the frontend
+  form.append("folderId", folderId);
+  form.append("options", JSON.stringify(options));
+
+  try {
+    // HubSpot file upload API endpoint
+    const hubSpotUrl = "https://api.hubapi.com/filemanager/api/v3/files/upload";
+    const hubSpotHeaders = {
+      "Authorization": "Bearer YOUR_HUBSPOT_API_KEY", // Replace with your HubSpot API key
+      ...form.getHeaders(),
+    };
+
+    // Upload the file to HubSpot using Axios to send the form data
+    const response = await axios.post(hubSpotUrl, form, {
+      headers: hubSpotHeaders
+    });
+
+    // Return the HubSpot response back to the frontend
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error uploading file to HubSpot:", error);
+    res.status(500).send("Error uploading file to HubSpot");
   }
 });
 app.listen(PORT, () => {
