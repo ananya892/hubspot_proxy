@@ -5,7 +5,7 @@ const cors = require('cors');
 const FormData = require("form-data");
 const app = express();
 const PORT = 3000;
-
+const auth = process.env.AUTH;
 // Middleware
 app.use(cors({ origin: 'https://www.absolutetranslations.com' })); 
 app.use(express.json({ limit: '10mb' }));
@@ -86,7 +86,7 @@ app.post("/upload-to-hubspot", async (req, res) => {
     // HubSpot file upload API endpoint
     const hubSpotUrl = "https://api.hubapi.com/filemanager/api/v3/files/upload";
     const hubSpotHeaders = {
-      "Authorization": "Bearer YOUR_HUBSPOT_API_KEY", // Replace with your HubSpot API key
+      "Authorization": `${auth}`, // Replace with your HubSpot API key
       ...form.getHeaders(),
     };
 
